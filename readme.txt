@@ -3,18 +3,25 @@ Spaceship Escape
 Overview
 --------
 
-You are in a spaceship trying to escape from an exploding planet. The planet is surrounded by asteroids, which your spaceship must avoid. You control the spaceship's acceleration at discrete time steps. You give the spaceship a course using json. There are three possible commands for each time step. Entering a 1 into the spaceship's computer instructs it to fire the thrusters and accelerate by one unit. Entering -1 makes the spaceship accelerate in reverse by one unit. Entering 0 will do nothing and the spaceship will continue coasting at its current velocity. 
+You find yourself on an exploding planet. You’re fortunate. You’ve anticipated this day, and saved an old frigate to escape in! Unfortunately your frigate doesn’t have the latest navigation systems, so you’re going to have to chart the escape course manually.
 
-Ways to die:
+Your frigate can fire thrusters to accelerate, coast at your existing speed, or fire thrusters to decelerate at any discrete time t. We’re going to describe our escape course as a function of discrete time t which starts at t = 0. Plotting an escape course means entering an array, indexed from time t = 0, with instructions for the thrusters:
 
-Hitting an asteroid. 
-Asteroids orbit the planet with a fixed period and initial offset given in the input json file. The asteroids can only occupy discrete positions, so you don't need to worry about hitting them when they are in between positions when you are going fast (v > 1). 
+Fire your thrusters to accelerate... 1
+Coast at your existing speed... 0
+Fire your thrusters to decelerate... -1
 
-Hitting the planet.
-If you accelerate in reverse, you can hit the planet.
+You plot your course by entering JSON into the frigate’s computer, for example:
 
-Being consumed by the planet's explosion.
-The planet is exploding at a rate given in the input json file (t_per_blast_move). Each t_per_blast_move seconds, the planet's blast radius increases by one position. If the spaceship is inside the blast radius, then you die.
+[0, 0, 1, 1, -1, 0, 1]
+
+The planet has an asteroid field circling it, and the asteroids can easily destroy your ship. In addition, the planet's blast radius will also follow your ship at a fixed rate given by t_per_blast_move, which is the amount of time it takes for the blast radius to increase by one position. The initial blast radius is 0. If your spaceship is inside the blast radius, you will die. Finally, it’s possible that you can drive your ship directly into the planet’s surface itself, in which case you will also be destroyed.
+
+You have a chart of these fields, so you know when the asteroids will be in your path. The asteroids circle the planet in concentric rings. Each ring contains exactly one asteroid, moving clockwise as t increases. Each asteroid has an offset which represents the orientation of the asteroid at t = 0, and a t_per_asteroid_cycle, which is the number of orientations the asteroid will successively assume as t increases.
+
+The planet itself is always at position -1.  There are no asteroids on it, but the blast will soon consume it. The frigate is at position 0 at t = 0. The asteroids are at positions 1, 2, 3... 
+
+Your ship travels along offset 0.  Don’t worry about hitting asteroids between positions when you’re going fast (v > 1); they are between orientations and therefore cannot be hit.
 
 Algorithm
 ---------
@@ -46,8 +53,6 @@ path.
 
 Time and Space Complexity
 -------------------------
-
-REVISE THIS TO INCLUDE EFFECT OF BLAST RADIUS. BLAST RADIUS SHOULD REDUCE TIME AND SPACE COMPLEXITY TO POSSIBLY SOMETHING POLYNOMIAL.
 
 Let d be the length of the course that is used to escape. Breadth first search 
 will explore all paths from the initial state that have length d. The 
